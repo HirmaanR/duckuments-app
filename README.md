@@ -2,7 +2,7 @@
 
 AI Assistant for generate `Modular Documentation`.
 
-![alt text](duckumets-img.jpg)
+![alt text](./duckuments/duckumets-img.jpg)
 ---
 
 ## Scenario
