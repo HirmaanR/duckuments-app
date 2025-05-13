@@ -1,0 +1,4 @@
+.env
+./duckumentsCore/db.sqlite3
+./duckumentsCore/media/documents/*
+./duckumentsCore/media/extractor/*
