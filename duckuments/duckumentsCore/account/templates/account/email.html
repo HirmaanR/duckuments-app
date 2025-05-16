@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Account</title>
+</head>
+
+<body>
+    <h1>Activate Account</h1>
+    <h3>Hi {{username}} , you can active you account with this link </h3>
+
+    {% url 'active-account' active_code=active_code as the_url %}
+
+    <a href='{{link}}{{the_url}}'>Active my account</a>
+</body>
+
+</html>

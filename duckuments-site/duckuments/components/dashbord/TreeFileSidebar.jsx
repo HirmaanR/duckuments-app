@@ -25,7 +25,7 @@ import {
 import { File, Folder } from "lucide-react";
 import { Button } from "../ui/button";
 
-const TreeFileSidebar = ({ slug,setMarkdown }) => {
+const TreeFileSidebar = ({ slug, setMarkdown }) => {
   const { getFileContentFunc, loading, error, ProjectData } =
     useGetFileContent();
 
@@ -41,7 +41,7 @@ const TreeFileSidebar = ({ slug,setMarkdown }) => {
     if (ProjectData) {
       if (ProjectData.type == "file") {
         console.log("content is ", ProjectData.content);
-        setMarkdown(ProjectData.content)
+        setMarkdown(ProjectData.content);
       } else {
         console.log("two else", ProjectData.type, typeof ProjectData.type);
       }
@@ -60,7 +60,12 @@ const TreeFileSidebar = ({ slug,setMarkdown }) => {
 
   useEffect(() => {
     handleLoad();
-  }, [slug, path]);
+    setPath("")
+  }, [slug]);
+
+  useEffect(() => {
+    handleLoad();
+  }, [path]);
 
   useEffect(() => {
     console.log("project data is : ", ProjectData);

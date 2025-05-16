@@ -1,6 +1,10 @@
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.urls import reverse
+
 from django.utils.crypto import get_random_string
-from rest_framework import status
+from rest_framework.status import *
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -11,17 +15,35 @@ from .serializer import (ChangePasswordSerializer, CreateUserSerializer,
                          CustomJWTLoginSerializer, UserAvatarChangeSerializer,
                          UserProfileSerializer)
 
+from .utilities import sendEmail
 
-# INFO : SignUp user
+
+# INFO : create new user account
 class SignUpView(APIView):
     def post(self, request):
         user = CreateUserSerializer(data=request.data)
         if user.is_valid():
-            password = request.POST.get("password")
-            user.save()
-            return Response(user.data["username"], status=status.HTTP_201_CREATED)
+            pass
 
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_info = {
+            "email": user.validated_data['email'],
+            "username": user.validated_data['username'],
+            "active_code": get_random_string(72)
+        }
+
+        # send active-link
+        absolute_url = "http://127.0.0.1:8000/"
+        message = render_to_string(
+            'account/email.html', context={'active_code': user_info.get("active_code"), 'username': user_info.get('username'), 'link': absolute_url})
+
+        plain_message = strip_tags(message)
+
+        if send_mail("active account with link", plain_message,
+                     "duckuments-core@gmail.com", [user_info.get("email")], False, html_message=message):
+            user.save(active_code=user_info.get('active_code'))
+            return Response("user crated", status=HTTP_200_OK)
+        else:
+            return Response("something went wrong", status=HTTP_400_BAD_REQUEST)
 
 
 # INFO : return all user information
@@ -31,7 +53,7 @@ class UserProfileView(APIView):
     def get(self, request):
         user = request.user
         profile = UserProfileSerializer(user)
-        return Response(profile.data, status=status.HTTP_200_OK)
+        return Response(profile.data, status=HTTP_200_OK)
 
 
 # INFO : change user avatar
@@ -51,7 +73,7 @@ class AvatarUploadView(APIView):
                     "avatar_url": user.avatar.url,
                 }
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 # INFO : change user password
@@ -61,12 +83,12 @@ class ChangePasswordView(APIView):
         email = request.data.get("email")
 
         if not email:
-            return Response("Email is required", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Email is required", status=HTTP_400_BAD_REQUEST)
 
         user = User.objects.filter(email=email).first()
         if not user:
             return Response(
-                "User with this email does not exist", status=status.HTTP_404_NOT_FOUND
+                "User with this email does not exist", status=HTTP_404_NOT_FOUND
             )
 
         # Generate a new random password
@@ -84,7 +106,7 @@ class ChangePasswordView(APIView):
             fail_silently=False,
         )
 
-        return Response("New password sent to your email", status=status.HTTP_200_OK)
+        return Response("New password sent to your email", status=HTTP_200_OK)
 
 
 class CustomJWTLoginView(APIView):
@@ -102,9 +124,21 @@ class CustomJWTLoginView(APIView):
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 },
-                status=status.HTTP_200_OK,
+                status=HTTP_200_OK,
             )
 
             return response
 
-        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
+
+class ActiveAccountView(APIView):
+    def get(request, self, active_code):
+        user = User.objects.filter(active_code=active_code).first()
+        if user:
+            user.set_is_active(True)
+            user.set_active_code(get_random_string(72))
+            user.save()
+            return Response("account Activated !", status=HTTP_200_OK)
+
+        return Response("account dose not exist!", status=HTTP_404_NOT_FOUND)

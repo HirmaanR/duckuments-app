@@ -89,6 +89,7 @@ import TreeFileSidebar from "./TreeFileSidebar";
 const Dashboard = () => {
   const { UserProjectFunc, loading, error, userData } = useAllUserProjects();
   const [selectedProjectSlug, setSelectedProjectSlug] = useState(null);
+  const [project, setProject] = useState({});
 
   const [markdown, setMarkdown] = useState("");
 
@@ -205,6 +206,7 @@ const Dashboard = () => {
                     href=""
                     onClick={() => {
                       setSelectedProjectSlug(item.slug);
+                      setProject(item)
                     }}
                     key={item.id}
                     className="hover:bg-sidebar-accent bg-sidebar hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
@@ -239,7 +241,7 @@ const Dashboard = () => {
         <ProjectSidebar />
         <SidebarInset>
           <header className="bg-background sticky top-0 flex shrink-0 items-center gap-2 border-b p-4">
-            <SidebarTrigger className="-ml-1" />
+            {/*<SidebarTrigger className="-ml-1" />*/}
             <ModeToggle />
             <Separator
               orientation="vertical"
@@ -248,11 +250,11 @@ const Dashboard = () => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">All Inboxes</BreadcrumbLink>
+                  <BreadcrumbLink href="#">All Projects</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Inbox</BreadcrumbPage>
+                  <BreadcrumbPage>{project ? project.title : null}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -261,12 +263,21 @@ const Dashboard = () => {
             {markdown !== "" ? (
               <MarkdownEditor markdown={markdown} />
             ) : (
-              <p>plesase select a file or project for show content</p>
+              <div className="place-content-center place-items-center">
+                <p className="text-xl capitalize">
+                  please select a project file to show content
+                </p>
+              </div>
             )}
           </div>
         </SidebarInset>
         {/* <TreeFileSidebar slug={selectedProjectSlug} setMarkdown={setMarkdown} /> */}
-        {selectedProjectSlug ? <TreeFileSidebar slug={selectedProjectSlug} setMarkdown={setMarkdown} />: null}
+        {selectedProjectSlug ? (
+          <TreeFileSidebar
+            slug={selectedProjectSlug}
+            setMarkdown={setMarkdown}
+          />
+        ) : null}
       </SidebarProvider>
     </div>
   );

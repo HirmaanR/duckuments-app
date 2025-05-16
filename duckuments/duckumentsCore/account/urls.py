@@ -13,4 +13,5 @@ urlpatterns = [
     path("avatar/", views.AvatarUploadView.as_view(), name="avatar"),
     path("password/", views.ChangePasswordView.as_view(), name="ChangePassword"),
     path("login/", views.CustomJWTLoginView.as_view(), name="login"),
+    path("active-account/<str:active_code>", views.ActiveAccountView.as_view(), name="active-account"),
 ]
