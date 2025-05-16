@@ -1,1 +1,0 @@
-## markdown md in duckuments Core

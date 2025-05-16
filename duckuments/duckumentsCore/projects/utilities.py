@@ -134,7 +134,7 @@ def sender(filename: str, filePath: str, code, projectTitle: str, projectDes: st
     url = "https://api.aimlapi.com/v1"
 
     # Insert your AIML API key in the quotation marks instead of <YOUR_AIMLAPI_KEY>:
-    key = "aa213c1a934745ab92eb69ccbb79c2af"
+    key = "70cb887af6514fd4806639425b92b04d"
 
     api = OpenAI(api_key=key, base_url=url)
 
@@ -172,6 +172,9 @@ def exporter(file_content, file_name, project_name, file_path):
 
     # Base directory
     base_dir = f"{settings.BASE_DIR}/media/documents/{project_name}"
+
+    # make dir for project
+    mkdir(base_dir)
 
     # Full path to target directory
     target_dir = os.path.join(base_dir, file_path)
